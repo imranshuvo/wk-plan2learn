@@ -1,0 +1,163 @@
+<?php
+require 'api.php';
+
+
+$course_id = isset($_GET['course']) && !empty($_GET['course']) ? $_GET['course'] : false;
+
+if($course_id){
+    //
+    $wk_course = getCourse($course_id);
+    
+    //general
+    $title = $wk_course->CourseName;
+    $provider = $wk_course->Provider;
+    $price_html = $wk_course->Price;
+    $price_description = $wk_course->PriceDescription;
+    $short_description = $wk_course->DescriptionShort;
+    $long_description = $wk_course->DescriptionLong;
+    $category = $wk_course->Category;
+    $subcategory = $wk_course->SubCategory;
+    $tags = $wk_course->Tags->string; //Array
+    $description_team_signup_url = $wk_course->DesriptionAndTeamsSignupURL;
+    $image = $wk_course->ImageURL;
+    
+    //Teams
+    $teams = $wk_course->Teams->Team; //Object
+    $team_id = $teams->TeamId;
+    $team_number = $teams->TeamNumber;
+    $seats = $teams->Seats;
+    $registration_deadline = $teams->RegistrationDeadline;
+    $participants_signedup = $teams->ParticipantsSignedUp;
+    $participants_waiting_list = $teams->ParticipantsWaitingList;
+    $start_date_time = $teams->StartDateTime;
+    $signup_url = $teams->SignupURL;
+    $signup_status = $teams->SignupStatus;
+    $team_prices = $teams->Prices->Price; //Array of objects
+    
+    
+    //TeamPeriods
+    $team_periods = $teams->TeamPeriods->TeamPeriod; //Array of objects
+    
+    
+    //Price
+    $price = $wk_course->Prices->Price; //Array of objects
+    $show_price = $wk_course->ShowPrice;
+    $show_price_inclusive_vat = $wk_course->ShowPriceInclusiveOfVat;
+    $show_price_lines = $wk_course->ShowPriceLines;
+}else {
+    echo 'Whoops! Something went wrong!';
+    die();
+}
+
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Nlphuset API with Plan2Learn</title>
+	<style>
+	    .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 3rem;
+        }
+        a.button {
+            background: blue;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 1px 1px #000;
+            font-size: 18px;
+        }
+	</style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="course-container">
+            <div class="course-details">
+                <div class="top">
+                    <div class="image"></div>
+                    <div class="summary">
+                        <h2><?php echo $title; ?></h2>
+                        <p>
+                            <?php if(!empty($long_description)){
+                                echo $long_description;
+                            }else{
+                                echo $short_description;
+                            }
+                            ?>
+                        </p>
+                    </div>
+                </div>
+                <div class="hold-details">
+                    <h3>Holdstart</h3>
+                    <div class="modules">
+                        <a class="button" href="<?php echo $signup_url; ?>" target="_blank">Tilmeld</a>
+                        <?php
+                        if(!empty($team_periods) && count($team_periods) > 0){
+                            
+                            foreach($team_periods as $period){
+                                echo '<div class="single-module">';
+                                $start_date = date('m/d', strtotime($period->StartTime));
+                                $start_time = date('h:i', strtotime($period->StartTime));
+                                
+                                $end_date = date('m/d', strtotime($period->EndTime));
+                                $end_time = date('h:i', strtotime($period->EndTime));
+                                
+                                
+                                $location = $period->Addresses; //Object
+                                
+                                $instructors = $period->Instructors->Instructor; //Array of object
+                                
+                                // echo '<pre>';
+                                // print_r($period);
+                                // echo '</pre>';
+                                ?>
+                                    <p><?php echo $title; ?>, <?php echo $period->Subject; ?> - Datoer: <?php echo $start_date;  ?> to <?php echo $end_date; ?></p>
+                                    <ul>
+                                        <li><?php echo $start_time ?> - <?php echo $end_time; ?></li>
+                                        <li><?php echo 'Location - not available'; ?></li>
+                                        <?php if(!empty($instructors) && count($instructors) > 0){ ?>
+                                        <li>Authors: 
+                                            <?php
+                                                    $teachers = array_column($instructors,'Name');
+                                                    echo implode(", ", $teachers);
+                                                }
+                                            
+                                            ?>
+                                        </li>
+                                    </ul>
+                                <?php 
+                                
+                               echo '</div>';
+                            }
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
+
+
+
+<?php
+
+echo '<h1>Raw Format</h1>';
+
+echo '<pre>';
+print_r($wk_course);
+echo '</pre>';
+
+?>
+
+

@@ -1,0 +1,78 @@
+<?php 
+require 'api.php';
+
+$courses = getAllCourse();
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Nlphuset API with Plan2Learn</title>
+	<style>
+	    .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 3rem;
+        }
+        .course-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .single-course {
+            flex-basis: 25%;
+            max-width: 300px;
+        }
+        .inner-border {
+            padding: 0.5rem;
+        }
+        .inner-content {
+            border: 1px solid #aaa;
+            padding: 10px;
+        }
+        p small {
+            display: block;
+        }
+	</style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="course-container">
+            <?php if($courses): ?>
+                <?php foreach($courses as $wk_course): ?>
+                    <?php 
+                        $course_id = $wk_course->CourseId;
+                        $title = $wk_course->CourseName;
+                        $provider = $wk_course->Provider;
+                        $price_html = $wk_course->Price;
+                        $price_description = $wk_course->PriceDescription;
+                        $short_description = $wk_course->DescriptionShort;
+                        $long_description = $wk_course->DescriptionLong;
+                        $category = $wk_course->Category;
+                        $subcategory = $wk_course->SubCategory;
+                        $tags = $wk_course->Tags->string; //Array
+                        $description_team_signup_url = $wk_course->DesriptionAndTeamsSignupURL;
+                        $image = $wk_course->ImageURL;
+                    ?>
+                    <div class="single-course">
+                        <div class="inner-border">
+                            <div class="inner-content">
+                                <?php if($image && $image != ''){ ?>
+                                    <img src="<?php echo $image; ?>">
+                                <?php } ?>
+                                <h3><a href="/p2l/single.php/?course=<?php echo $course_id; ?>"><?php echo $title; ?></a></h3>
+                                <p><?php echo $price_html; ?><small><?php echo $price_description; ?></small></p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+            <h2>Ingen kurser fundet!</h2>
+            <?php endif; ?>
+        </div>
+    </div>
+
+</body>
+</html>
